@@ -3,9 +3,8 @@ package com.example.springsecurity.model;
 import lombok.Value;
 
 @Value
-public class Secret {
-
+public class SecretWithPK {
+    String privateKey;
     String secret;
     Integer id;
-
 }
