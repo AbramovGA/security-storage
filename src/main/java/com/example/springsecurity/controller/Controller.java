@@ -3,8 +3,8 @@ package com.example.springsecurity.controller;
 
 import com.example.springsecurity.model.PrivateKey;
 import com.example.springsecurity.model.Secret;
-import com.example.springsecurity.model.SecretWithPK;
 import com.example.springsecurity.repository.EncryptionDataRepo;
+import com.example.springsecurity.repository.PrivateKeyInMemoryRepo;
 import com.example.springsecurity.repository.SecretRepo;
 import com.example.springsecurity.service.EncryptionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +23,24 @@ public class Controller {
 
     private final EncryptionDataRepo encryptionDataRepo;
 
+    private PrivateKeyInMemoryRepo pkRepo;
 
     @Autowired
-    public Controller(SecretRepo secretRepo, EncryptionDataRepo encryptionDataRepo) {
+    public Controller(SecretRepo secretRepo, EncryptionDataRepo encryptionDataRepo, PrivateKeyInMemoryRepo pkRepo) {
         this.secretRepo = secretRepo;
         this.encryptionDataRepo = encryptionDataRepo;
+        this.pkRepo = pkRepo;
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<String> get(@PathVariable("id") final Integer id, @RequestParam("key") final PrivateKey privateKey) {
+    public ResponseEntity<String> get(@PathVariable("id") final Integer id) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
 
         ResponseEntity response;
+
+        PrivateKey privateKey = pkRepo.getPrivateKey();
 
         if (authorize(privateKey, encryptionDataRepo)) {
             response = ResponseEntity.ok()
@@ -50,11 +54,12 @@ public class Controller {
     }
 
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody final SecretWithPK secretInfo) {
+    public ResponseEntity<Void> create(@RequestBody final Secret secretInfo) {
 
         HttpStatus status;
 
-        PrivateKey privateKey = new PrivateKey(secretInfo.getPrivateKey());
+        PrivateKey privateKey = pkRepo.getPrivateKey();
+
         Secret secret = new Secret(secretInfo.getSecret(), secretInfo.getId());
         if (authorize(privateKey, encryptionDataRepo)) {
             secretRepo.put(secretInfo.getId(), EncryptionService.encrypt(privateKey.getPrivateKey(), secret.getSecret(), encryptionDataRepo.getSalt()));
@@ -65,4 +70,20 @@ public class Controller {
 
         return new ResponseEntity<>(status);
     }
+
+    @PostMapping("/create-pk")
+    public ResponseEntity<Void> createPK(@RequestBody final PrivateKey privateKey) {
+
+        HttpStatus status;
+
+        if (authorize(privateKey, encryptionDataRepo)) {
+            pkRepo.setPrivateKey(privateKey);
+            status = HttpStatus.CREATED;
+        } else {
+            status = HttpStatus.UNAUTHORIZED;
+        }
+
+        return new ResponseEntity<>(status);
+    }
+
 }
