@@ -6,14 +6,14 @@ import com.example.springsecurity.model.Secret;
 import com.example.springsecurity.repository.EncryptionDataRepo;
 import com.example.springsecurity.repository.PrivateKeyInMemoryRepo;
 import com.example.springsecurity.repository.SecretRepo;
-import com.example.springsecurity.service.EncryptionService;
+import com.example.springsecurity.service.SymmetricEncryptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.example.springsecurity.service.AuthorizationService.authorize;
+import static com.example.springsecurity.service.AuthenticationService.authenticate;
 
 @RestController
 @RequestMapping("/")
@@ -42,10 +42,10 @@ public class Controller {
 
         PrivateKey privateKey = pkRepo.getPrivateKey();
 
-        if (authorize(privateKey, encryptionDataRepo)) {
+        if (authenticate(privateKey, encryptionDataRepo)) {
             response = ResponseEntity.ok()
                     .headers(headers)
-                    .body(EncryptionService.decrypt(privateKey.getPrivateKey(), secretRepo.get(id), encryptionDataRepo.getSalt()));
+                    .body(SymmetricEncryptionService.decrypt(privateKey.getPrivateKey(), secretRepo.get(id), encryptionDataRepo.getSalt()));
         } else {
             response = new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -61,8 +61,8 @@ public class Controller {
         PrivateKey privateKey = pkRepo.getPrivateKey();
 
         Secret secret = new Secret(secretInfo.getSecret(), secretInfo.getId());
-        if (authorize(privateKey, encryptionDataRepo)) {
-            secretRepo.put(secretInfo.getId(), EncryptionService.encrypt(privateKey.getPrivateKey(), secret.getSecret(), encryptionDataRepo.getSalt()));
+        if (authenticate(privateKey, encryptionDataRepo)) {
+            secretRepo.put(secretInfo.getId(), SymmetricEncryptionService.encrypt(privateKey.getPrivateKey(), secret.getSecret(), encryptionDataRepo.getSalt()));
             status = HttpStatus.CREATED;
         } else {
             status = HttpStatus.UNAUTHORIZED;
@@ -76,7 +76,7 @@ public class Controller {
 
         HttpStatus status;
 
-        if (authorize(privateKey, encryptionDataRepo)) {
+        if (authenticate(privateKey, encryptionDataRepo)) {
             pkRepo.setPrivateKey(privateKey);
             status = HttpStatus.CREATED;
         } else {

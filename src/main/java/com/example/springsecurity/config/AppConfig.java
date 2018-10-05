@@ -5,6 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@PropertySource("classpath:pk/pkhash.properties")
+@PropertySource("classpath:encryptionData/encryptionData.properties")
 public class AppConfig {
 }
