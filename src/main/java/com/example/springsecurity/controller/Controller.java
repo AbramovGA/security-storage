@@ -70,20 +70,26 @@ public class Controller {
 
         return new ResponseEntity<>(status);
     }
-//
-//    @PostMapping("/create-pk")
-//    public ResponseEntity<Void> createPK(@RequestBody final PrivateKey privateKey) {
-//
-//        HttpStatus status;
-//
-//        if (authenticate(privateKey, encryptionDataRepo)) {
-//            pkRepo.setPrivateKey(privateKey);
-//            status = HttpStatus.CREATED;
-//        } else {
-//            status = HttpStatus.UNAUTHORIZED;
-//        }
-//
-//        return new ResponseEntity<>(status);
-//    }
+
+    /*
+     *If you want to enter PK with HTTP request, the code below should make the deal
+     * Note: change annotation in pkRepo from @Value to @Data
+     */
+    /*
+    @PostMapping("/create-pk")
+    public ResponseEntity<Void> createPK(@RequestBody final PrivateKey privateKey) {
+
+        HttpStatus status;
+
+        if (authenticate(privateKey, encryptionDataRepo)) {
+            pkRepo.setPrivateKey(privateKey);
+            status = HttpStatus.CREATED;
+        } else {
+            status = HttpStatus.UNAUTHORIZED;
+        }
+
+        return new ResponseEntity<>(status);
+    }
+    //*/
 
 }

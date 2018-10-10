@@ -32,7 +32,7 @@ public class KeyEnterService {
     }
 
     private static boolean matches(PrivateKey pk, String pkHash) {
-        boolean result = false;
+        boolean result;
 
         if (!AsymmetricEncryptionService.matches(pk, pkHash)) {
             System.out.println("The key doesn't matches hash.");
