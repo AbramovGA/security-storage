@@ -2,16 +2,11 @@ package com.example.springsecurity.repository;
 
 
 import com.example.springsecurity.model.PrivateKey;
-import com.example.springsecurity.service.KeyEnterService;
-import lombok.Value;
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
 @Component
-@Value
+@Data
 public class PrivateKeyInMemoryRepo {
     PrivateKey privateKey;
-
-    public PrivateKeyInMemoryRepo() {
-        privateKey = KeyEnterService.acceptKey();
-    }
 }

@@ -75,7 +75,7 @@ public class Controller {
      *If you want to enter PK with HTTP request, the code below should make the deal
      * Note: change annotation in pkRepo from @Value to @Data
      */
-    /*
+    //*
     @PostMapping("/create-pk")
     public ResponseEntity<Void> createPK(@RequestBody final PrivateKey privateKey) {
 
